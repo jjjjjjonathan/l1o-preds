@@ -1,5 +1,6 @@
 #! python3
-import webbrowser, sys, re
+import sys, re, requests
+from bs4 import BeautifulSoup
 
 
 def get_roster_url(club_name, division):
@@ -71,9 +72,13 @@ if len(sys.argv) > 2:
         season_code = 809616
 
     if type(roster_code) is int:
-        print(
-            f"https://www.league1ontario.com/schedule/team_instance/{roster_code}?subseason={season_code}"
-        )
+        address = f"https://www.league1ontario.com/schedule/team_instance/{roster_code}?subseason={season_code}"
+
+        res = requests.get(address)
+        res.raise_for_status()
+        soup = BeautifulSoup(res.text, "html.parser")
+        results = soup.select(".compactGameList")
+        print(results)
     else:
         print("not an existing team")
 
